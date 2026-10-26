@@ -1,0 +1,90 @@
+harness-package:
+  stage: .pre
+  image: python:3.13-bookworm
+  variables:
+    HYPOTHESIS_PROFILE: ci
+    UV_CACHE_DIR: $CI_PROJECT_DIR/.uv-cache
+  timeout: 30m
+  interruptible: true
+  resource_group: harness-$CI_PROJECT_ID
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+  allow_failure: false
+  script:
+    - python -m pip install uv==0.13.1
+    - python -I .harness/runner.pyz setup
+    - python -I .harness/runner.pyz check --group package
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths: [.harness/reports/]
+
+harness-static:
+  stage: .pre
+  image: python:3.13-bookworm
+  variables:
+    HYPOTHESIS_PROFILE: ci
+    UV_CACHE_DIR: $CI_PROJECT_DIR/.uv-cache
+  timeout: 30m
+  interruptible: true
+  resource_group: harness-$CI_PROJECT_ID
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+  allow_failure: false
+  script:
+    - python -m pip install uv==0.13.1
+    - python -I .harness/runner.pyz setup
+    - python -I .harness/runner.pyz check --group static
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths: [.harness/reports/]
+
+harness-tests:
+  stage: .pre
+  image: python:3.13-bookworm
+  variables:
+    HYPOTHESIS_PROFILE: ci
+    UV_CACHE_DIR: $CI_PROJECT_DIR/.uv-cache
+  timeout: 30m
+  interruptible: true
+  resource_group: harness-$CI_PROJECT_ID
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+  allow_failure: false
+  script:
+    - python -m pip install uv==0.13.1
+    - python -I .harness/runner.pyz setup
+    - python -I .harness/runner.pyz check --group tests
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths: [.harness/reports/]
+
+harness-gate:
+  stage: .post
+  image: python:3.13-bookworm
+  when: always
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: always
+  allow_failure: false
+  needs:
+    - job: harness-package
+      artifacts: true
+    - job: harness-static
+      artifacts: true
+    - job: harness-tests
+      artifacts: true
+  script:
+    - python -I .harness/runner.pyz gate

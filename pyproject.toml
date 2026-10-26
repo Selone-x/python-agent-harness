@@ -1,0 +1,58 @@
+[project]
+name = "python-agent-harness"
+version = "0.1.0"
+description = "Build project-specific, executable quality harnesses for AI-assisted Python development"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+harness = "python_agent_harness.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/python_agent_harness"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/.reports/**", "/.venv/**", "/.uv-cache/**", "/dist/**", "/.harness/**"]
+
+[dependency-groups]
+dev = [
+  "ruff==0.16.10", "ty==0.0.90", "pytest==9.1.1", "pytest-cov==7.1.0",
+  "hypothesis==6.170.5", "PyYAML==6.0.3", "pre-commit==4.7.0",
+  "fixit==2.2.1", "import-linter==2.15",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+extend-exclude = [".reports", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C90", "ANN", "S", "BLE", "PGH", "RUF"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = ["--strict-config", "--strict-markers", "--cov=python_agent_harness", "--cov-branch", "--cov-report=term-missing:skip-covered", "--cov-report=json:.reports/coverage.json", "--cov-report=xml:.reports/coverage.xml"]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+relative_files = true
+source = ["src/python_agent_harness"]
+
+[tool.coverage.report]
+precision = 2
+exclude_also = ["if __name__ == .__main__.:" ]
+
+[tool.ty.src]
+include = ["src", "tests"]

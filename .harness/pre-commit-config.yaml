@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: harness-policy
+        name: Harness policy and architecture
+        entry: python -I .harness/runner.pyz audit
+        language: system
+        pass_filenames: false
+        always_run: true

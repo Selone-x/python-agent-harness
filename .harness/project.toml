@@ -1,0 +1,92 @@
+schema_version = 1
+name = "python-agent-harness"
+kind = "library"
+python = "3.13"
+description = "Project-specific harness construction with explicit enforcement limits and no hosted service."
+sources = ["src/python_agent_harness"]
+tests = ["tests"]
+inputs = ["skills/build-python-harness", "rules", "justfile", ".pre-commit-config.yaml"]
+providers = ["github", "gitlab"]
+setup = [["uv", "sync", "--locked"]]
+
+[quality]
+lines = "97"
+branches = "100"
+coverage = ".reports/coverage.json"
+output_limit = 1048576
+deep_budget = 900
+
+[[checks]]
+id = "policy"
+group = "static"
+argv = ["@harness", "audit"]
+timeout = 30
+
+[[checks]]
+id = "format"
+group = "static"
+argv = ["uv", "run", "--locked", "ruff", "format", "--check", "."]
+timeout = 60
+
+[[checks]]
+id = "lint"
+group = "static"
+argv = ["uv", "run", "--locked", "ruff", "check", "."]
+timeout = 60
+
+[[checks]]
+id = "types"
+group = "static"
+argv = ["uv", "run", "--locked", "ty", "check"]
+timeout = 60
+
+[[checks]]
+id = "behavior"
+group = "tests"
+argv = ["uv", "run", "--locked", "pytest", "--basetemp=.reports/test-tmp", "-o", "tmp_path_retention_policy=failed", "-o", "tmp_path_retention_count=1"]
+timeout = 120
+
+[[checks]]
+id = "build"
+group = "package"
+argv = ["uv", "build", "--no-sources"]
+timeout = 120
+
+[[checks]]
+id = "wheel-import"
+group = "package"
+argv = ["@harness", "package", "--module", "python_agent_harness"]
+timeout = 60
+
+[[requirements]]
+id = "strict-specification"
+description = "Reject misspelled policy, unbound checks and escaping paths."
+enforcement = "test"
+check = "behavior"
+evidence = ["tests/test_config.py"]
+
+[[requirements]]
+id = "bounded-commands"
+description = "Observe real exits and stop timeouts/output floods without leaving workers."
+enforcement = "test"
+check = "behavior"
+evidence = ["tests/test_runner.py"]
+
+[[requirements]]
+id = "preserve-user-content"
+description = "Refuse unowned conflicts and preserve instructions outside managed blocks."
+enforcement = "test"
+check = "behavior"
+evidence = ["tests/test_render.py"]
+
+[[requirements]]
+id = "custom-lint-engine"
+description = "Run positive and negative project-rule examples through real Fixit."
+enforcement = "test"
+check = "behavior"
+evidence = ["tests/test_custom_lint.py"]
+
+[[requirements]]
+id = "independent-oracle"
+description = "Review test expectations against documented contracts and literal boundary examples."
+enforcement = "review"

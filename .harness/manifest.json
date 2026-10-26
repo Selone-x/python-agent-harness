@@ -1,0 +1,39 @@
+{
+  "files": {
+    ".github/workflows/harness.yml": {
+      "block": false,
+      "hash": "665f778411d4f34d898db47a3c148046669a73e3995385a2316a3bb0ea0f469d"
+    },
+    ".gitlab-ci.yml": {
+      "block": false,
+      "hash": "502e4a2d35d7b0411601ea5e108f9414fc7143e9b1748a1b55e34d0f55102067"
+    },
+    ".harness/gitlab-ci.yml": {
+      "block": false,
+      "hash": "b42ced6320cfbc9079d1fb492f2eff5009fb738f55ee4705b90df9e480165e9c"
+    },
+    ".harness/policy.md": {
+      "block": false,
+      "hash": "e7c2f5d4ea2b1df2cfb9b37a24754db7a6fef5ad9703827f9bbd42da7086bb39"
+    },
+    ".harness/pre-commit-config.yaml": {
+      "block": false,
+      "hash": "45532a73ea42e1c2016de6fb278a39d51a43e3124235ca1700185ee34dac73d5"
+    },
+    ".harness/runner.pyz": {
+      "block": false,
+      "hash": "823b6ccdf56505b41e6b63f1d42275907f80954dce3b29f1887e48c1019a8cdf"
+    },
+    "AGENTS.md": {
+      "block": true,
+      "hash": "9cb411e62009b1314b0d5251c57351e1dacac0ad47ba82edc8b5350c8491638c"
+    },
+    "CLAUDE.md": {
+      "block": true,
+      "hash": "e383efed82a776fba4dc3aa8b08aabf0edbae2901cd93bb28ef9c11ff16ec903"
+    }
+  },
+  "policy": "72b90da25ca8119dfb0f9f5457161a86f600c90aefbd6a936075e930e116003b",
+  "schema_version": 1,
+  "version": "0.1.0"
+}
