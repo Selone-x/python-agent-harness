@@ -101,6 +101,17 @@ def run_setup(root: Path, spec: Spec) -> tuple[CommandResult, ...]:
     return tuple(result)
 
 
+def fresh_coverage(root: Path, spec: Spec, previous: int | None) -> tuple[Finding, ...]:
+    """Require this run's coverage report before checking inventory and ratios."""
+    try:
+        path = inside(root, spec.coverage)
+        if previous is not None and path.stat().st_mtime_ns == previous:
+            raise HarnessError("Coverage report was not refreshed by this test run")
+        return verify_coverage(root, spec)
+    except (OSError, ValueError) as error:
+        return (Finding(code="coverage.invalid", status="fail", message=str(error)),)
+
+
 def group_checks(
     root: Path, spec: Spec, group: str
 ) -> tuple[tuple[CommandResult, ...], tuple[Finding, ...]]:
@@ -124,14 +135,7 @@ def group_checks(
             )
         else:
             results.append(execute(root, check, spec.output_limit, min(check.timeout, remaining)))
-    findings: tuple[Finding, ...] = ()
-    if group == "tests":
-        try:
-            if previous is not None and coverage_path.stat().st_mtime_ns == previous:
-                raise HarnessError("Coverage report was not refreshed by this test run")
-            findings = verify_coverage(root, spec)
-        except (OSError, ValueError) as error:
-            findings = (Finding(code="coverage.invalid", status="fail", message=str(error)),)
+    findings = fresh_coverage(root, spec, previous) if group == "tests" else ()
     return tuple(results), findings
 
 

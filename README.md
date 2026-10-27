@@ -1,152 +1,192 @@
-# Python Agent Harness
+<p align="center">
+  <img src="assets/readme-hero.svg" alt="Python Agent Harness: agree requirements, define checks, run them, review the evidence." width="100%">
+</p>
 
-Build an executable quality harness from a Python project's own requirements.
-Use your existing coding agent: no model API key or hosted service is required.
+<h1 align="center">Python Agent Harness</h1>
 
-The agent agrees the architecture and guidelines with you. The CLI validates the
-specification, previews generated files, runs bounded checks, and reports what
-was actually verified. It does not decide your business contracts or silently
-rewrite an existing application to satisfy a generic architecture.
+<p align="center">
+  <strong>Give your Python coding agent a quality bar.</strong><br>
+  Turn your project's architecture, conventions and invariants into checks you can run locally and enforce in CI.
+</p>
 
-## Local development
+<p align="center">
+  Python 3.13+ &nbsp;·&nbsp; Zero runtime dependencies &nbsp;·&nbsp; GitHub + GitLab &nbsp;·&nbsp; Early preview
+</p>
 
-Requires Python 3.13+, uv and just on Linux or macOS. Process-group and output
-limits use POSIX primitives; Windows execution is not supported in this version.
+<p align="center">
+  <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
+  <a href="#what-you-get">What you get</a> &nbsp;·&nbsp;
+  <a href="#use-your-existing-agent">Agent skills</a> &nbsp;·&nbsp;
+  <a href="CONTRIBUTING.md">Contribute</a>
+</p>
+
+---
+
+Your agent can write the next feature. Your team still needs a shared definition of
+acceptable code: which imports are allowed, what tests must demonstrate, which
+checks block a merge, and when a result is too old to trust.
+
+**Python Agent Harness makes those decisions executable.** Agree the requirements
+with your agent, record them in one specification, and generate a workflow that
+checks the resulting code. Use it for a library, service, CLI or research project.
+
+- **Build around your project.** Capture its architecture and invariants. Adoption
+  keeps existing tools such as Poetry, Black and mypy.
+- **Give feedback early.** Run formatting, types, custom rules and tests through
+  the same configured checks locally and in CI.
+- **Keep evidence current.** Bind reports to the source, tests, policy and declared
+  inputs. Missing, failed, skipped or stale required evidence blocks the gate.
+- **Make deeper testing deliberate.** Add property tests, API contracts and mutation
+  testing with an explicit scope and execution budget.
+
+The runtime uses the Python standard library. Bring your existing coding agent;
+there is no additional LLM API key or hosted harness service to configure.
+
+## Quick start
+
+You need **Python 3.13+, uv and just**, on Linux or macOS. The runner uses POSIX
+process groups; Windows execution is currently unsupported.
+
+From a local checkout, create a project in an empty destination:
 
 ```sh
+uv sync --locked
+uv run --locked harness --root ../my-project init \
+  --name my-project --package my_project --kind library \
+  --provider github --scaffold
+```
+
+Open `../my-project/.harness/project.toml`. Agree the purpose, source and test
+roots, architecture boundaries and acceptance criteria with your agent. Then
+validate the specification and review the generated changes:
+
+```sh
+uv run --locked harness --root ../my-project validate
+uv run --locked harness --root ../my-project render
+uv run --locked harness --root ../my-project render --apply
+```
+
+Run the generated workflow:
+
+```sh
+cd ../my-project
+git init -b feat/bootstrap
 just setup
-uv run harness --help
 just check
 ```
 
-The runtime has no third-party dependencies. Development dependencies are locked
-in `uv.lock`. Tests and command logs use disk-backed workspace directories.
+Commit the generated `uv.lock` in your feature branch. CI uses that lock.
+The initial version test checks packaging; add behavior tests for your features.
 
-## Create a new project
+Choose `--kind service`, `cli` or `research` for other project types. Use
+`--provider gitlab`, or specify both providers, to generate the corresponding CI.
+Each project carries its own `.harness/runner.pyz`, so its checks can run without
+an installed copy of this constructor.
 
-Create an empty destination directory, then run from this repository:
+**Already have a project?** Start with `inspect`, then `init` **without
+`--scaffold`**. Agree the real commands before generating the workflow. Existing
+source, tools and unrelated CI jobs are preserved; edited managed files surface
+as conflicts. Follow the [adoption guide](docs/usage.md#adopt-an-existing-project).
 
-```sh
-uv run harness --root /path/to/new-project init \
-  --name example-project --package example_project --kind library \
-  --provider github --provider gitlab --scaffold
-uv run harness --root /path/to/new-project inspect
-```
+## What you get
 
-Agree the description, requirements, source/test roots, check commands and
-dependency boundaries in `.harness/project.toml`. `python` is the harness runner
-version, not a request to migrate an existing application's Python version.
-The initial package/version test is only a packaging smoke test.
+New projects start with a practical toolchain. Existing projects keep their agreed
+tools and thresholds.
 
-```sh
-uv run harness --root /path/to/new-project validate
-uv run harness --root /path/to/new-project render
-uv run harness --root /path/to/new-project render --apply
-```
+| Concern | Tool or mechanism | Included in new projects |
+| --- | --- | --- |
+| Formatting and common defects | Ruff | Required static checks |
+| Type correctness | ty | Required static check |
+| Unused code | Vulture | Source and tests scanned together |
+| Code complexity | Ruff C901 + Complexipy | Cyclomatic and cognitive limits |
+| Project-specific syntax rules | ast-grep | Real rule fixtures, snapshots and source scans |
+| Behavior and coverage | pytest + coverage.py | Complete source inventory, line and branch gates |
+| Generated test cases | Hypothesis | Shared, bounded development and CI profiles |
+| Import boundaries | Built-in graph checker | Enforces the boundaries you declare, including transitive imports |
+| Distributions | Build and wheel import checks | Required for libraries |
+| API contracts | Schemathesis | Optional profile for an agreed schema and isolated service |
+| Assertion sensitivity | mutmut + strict acceptance adapter | Optional profile with one worker and explicit budgets |
 
-In the generated project, initialize Git with `git init -b feat/bootstrap` if
-it is a new repository, then run `just setup`. Commit the generated `uv.lock` in a
-feature branch, then `just check`. Setup resolves dependencies locally; CI uses
-the committed lock and refuses to silently change it.
+The scaffold proposes **97% line coverage, 100% branch coverage, cyclomatic
+complexity ≤10 and cognitive complexity ≤15**. These are visible configuration,
+reviewed with your project's requirements. Coverage measures execution; independent
+oracles and meaningful assertions still need tests and review.
 
-Each generated project carries `.harness/runner.pyz`, a reproducible bundle of
-the stdlib-only runtime. It works without publishing this tool to PyPI:
+`just check` runs the required groups and aggregate gate. Pre-commit runs the
+static group. `just deep` explicitly runs configured API, mutation or benchmark
+checks. Commands run sequentially with time and output limits; pytest temporary
+files stay in the project.
 
-```sh
-python3 -I .harness/runner.pyz validate
-python3 -I .harness/runner.pyz check --group static
-python3 -I .harness/runner.pyz check --group tests
-python3 -I .harness/runner.pyz gate
-```
+See the [tool workflow guide](skills/build-python-harness/references/tool-workflows.md)
+for how each tool connects to a requirement, command and acceptance condition.
 
-Library projects also require the package group. Service, CLI and research
-projects do not inherit a wheel requirement. Every configured command within a
-required group must succeed. The optional `deep` group runs only when explicitly
-requested and has a total time budget.
+## Use your existing agent
 
-## Adopt an existing project
+Five self-contained skills help your agent build the harness and work within it.
+Copy the selected folders, including their references and license notices, into
+your agent's skill directory. See [installation details](docs/usage.md#install-the-skills).
 
-Run `inspect` first. Then run `init` **without** `--scaffold`; only the draft
-specification is created. Adoption drafts deliberately fail until the agent and
-user replace the draft commands with the project's real formatter, type checker,
-test runner, coverage command and setup commands. Existing Black/mypy/Poetry or
-other tooling is not replaced with the defaults used by new projects.
+| Skill | Ask your agent to… |
+| --- | --- |
+| [build-python-harness](skills/build-python-harness/SKILL.md) | Create, adopt, audit or update a project-specific harness |
+| [spec-to-code-compliance](skills/spec-to-code-compliance/SKILL.md) | Trace requirements to real implementation paths and test evidence |
+| [semgrep-rule-creator](skills/semgrep-rule-creator/SKILL.md) | Build and test custom rules with the chosen engine, including ast-grep |
+| [property-based-testing](skills/property-based-testing/SKILL.md) | Design useful generators, properties and independent test oracles |
+| [mutation-testing](skills/mutation-testing/SKILL.md) | Run a bounded mutmut campaign and distinguish gaps, equivalence and inconclusive results |
 
-Keep the existing architecture and commands. Adjust source roots for flat,
-namespace or multiple-package layouts. Do not automatically lower coverage
-requirements to the currently achieved result. Report debt and plan its repair
-as a separate task.
+For example, once the first skill is installed:
 
-Rendering owns only declared output files and managed instruction blocks.
-It preserves surrounding `AGENTS.md`/`CLAUDE.md` content and refuses to overwrite
-edited generated files or conflicting workflows. Existing GitLab jobs remain
-untouched: add `local: .harness/gitlab-ci.yml` to their existing include structure
-and matching merge-request workflow/job rules directly in the root configuration.
-The audit reports that integration as incomplete until the include is present.
+> Use build-python-harness from `/path/to/python-agent-harness` to adopt this
+> service. Keep Poetry, Black and mypy. Check our domain-to-adapter import
+> boundary, agree the test invariants with me, and preview changes before applying.
 
-## Specification and evidence
+Skills guide the agent's decisions. The runtime executes the checks. Requirements
+that need human judgment remain explicitly marked for review.
 
-See [the specification reference](docs/specification.md). The specification is
-the source of truth for generated instructions and CI, with explicit mappings
-from requirements to checks, evidence files or human review.
+## Make it yours
 
-Coverage requires a complete inventory, even for modules never imported by
-tests. Lines and branches use separate exact comparisons. A program without
-branches can pass; missing tests or an empty coverage report cannot.
+The specification is a small TOML file in your project. Add checks as argv arrays,
+declare architecture boundaries, and map requirements to checks, tests or review.
+Include rule configuration, snapshots and non-Python fixtures in `inputs` so
+changing them invalidates old reports.
 
-Static import boundaries include transitive local imports. Dynamic imports,
-framework injection and runtime wiring require tests/review. A useful assertion
-oracle cannot be established by the presence of a test filename or a high
-coverage percentage. Mutation and benchmark commands can be added to the deep
-group; no general performance baseline or mutation acceptance is invented.
+Rendering previews changes before applying them and preserves content outside
+managed blocks in `AGENTS.md` and `CLAUDE.md`. You can inspect the generated code,
+CI and policy alongside the application in the same pull request.
 
-Reports are bound to the policy, runtime, production source, tests and dependency
-metadata. Stale reports, skipped groups, nonzero exits, timeouts and excessive
-output fail. Each command runs without a shell, sequentially, in a process group;
-logs are bounded. Commands in an approved spec still execute arbitrary project
-code: this tool is not a sandbox for malicious code.
+- [Specification reference](docs/specification.md) — schema, checks and evidence.
+- [Usage guide](docs/usage.md) — setup, adoption, optional profiles and operating limits.
+- [Protection guide](skills/build-python-harness/references/protection.md) — connect the gate to actual hosting settings.
+- [Skill evaluation](docs/skill-evaluation.md) — observed results and what remains unverified.
 
-## Install the skill
+Generated CI provides the gate; configure branch protection on your hosting
+platform to require it. `doctor` reads actual GitHub/GitLab settings and reports
+unavailable evidence. A generated workflow alone does not establish server protection.
 
-The self-contained skill is [skills/build-python-harness](skills/build-python-harness/SKILL.md).
-Copy that directory, with its references, to one of:
+## Help shape the project
 
-- Codex: `~/.agents/skills/build-python-harness` or the project's `.agents/skills/`.
-- Claude Code: `~/.claude/skills/build-python-harness` or the project's `.claude/skills/`.
+The most useful contributions start with a concrete Python workflow:
 
-Ask your agent to use `build-python-harness`, describing the project and desired
-architecture. The skill uses this local checkout via `uv run --project /path/to/python-agent-harness harness ...`.
-Other agents can use the same instructions and CLI; host discovery and behavior
-have not been certified for every agent. See [skill evaluation scenarios](docs/skill-evaluation.md).
+- **Bring an adoption case.** Try a flat layout, namespace package or an existing
+  toolchain; share the smallest reproduction of any integration problem.
+- **Teach it a useful rule.** Include code that should match and code that should
+  pass, and run both through the actual engine.
+- **Improve a skill.** Show a realistic request, the observed decision and how to
+  verify a better outcome.
+- **Strengthen the runtime.** Help with provider adapters, report validation,
+  packaging or bounded execution, backed by independent regressions.
 
-## GitHub and GitLab
+Start with [CONTRIBUTING.md](CONTRIBUTING.md) for the repository map, local checks
+and pull-request expectations. Small, reproducible improvements are welcome.
 
-Both generators preserve unrelated jobs. GitHub has a required `harness-gate`
-job with `always()` and strict report validation. GitLab uses reserved `.pre`
-and `.post` stages to avoid replacing a project's stages. Jobs are not allowed
-to fail, and artifacts expire after seven days.
+## Status and license
 
-Generating YAML does not configure server protection. Follow
-[the protection guide](skills/build-python-harness/references/protection.md), then verify actual settings:
+**Early preview.** The repository includes executable unit/integration checks and
+scoped skill evaluations. Automatic host discovery, every agent host and live
+provider protection have not all been verified. Runtime checks cannot establish
+every business invariant or sandbox arbitrary project code.
 
-```sh
-uv run harness --root /path/to/project doctor --provider github --repository owner/repo
-uv run harness --root /path/to/project doctor --provider gitlab --repository group/project
-```
-
-Doctor uses the user's authenticated `gh`/`glab` CLI in read-only mode. Unavailable
-settings and protections are reported as blocked. It does not store credentials
-or modify server settings. GitLab required approvals depend on the tier.
-
-A repository-local manifest detects accidental drift; it is not an independent
-trust authority. An agent able to edit CI, regenerate policy and approve its own
-changes can bypass repository-local controls. Separate credentials and protected
-review of policy/CI are necessary for stronger enforcement.
-
-## Current release status
-
-The project is being prepared locally for an open-source release. The license
-has intentionally **not** been selected. Do not publish a release, redistribute
-derived code under an assumed license, or describe licensing as completed.
-Live provider tests and behavioral runs in each agent host must be recorded
-separately from local unit/integration tests.
+The **license for the original project code is still pending**. Public release
+and contribution licensing remain unfinished. The four Trail of Bits skill
+adaptations carry their own **CC BY-SA 4.0** licenses and attribution notices;
+those terms apply to those directories. See the included notices when copying them.

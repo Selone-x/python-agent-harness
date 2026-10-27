@@ -10,6 +10,8 @@ path or assume a published package. Run its CLI as
 
 Establish the requested mode: new project, adoption, audit or update. Read only
 the relevant parts of [the workflow](references/workflow.md).
+Use [the tool map](references/tool-workflows.md) when selecting tools or explaining
+the path from a requirement to a command, artifact and acceptance condition.
 
 Before generation, agree the project's purpose, architecture, source/test roots,
 toolchain, check commands and test invariants. Inspect existing code and
@@ -26,6 +28,19 @@ it in a feature branch. Keep unrelated application changes out of adoption.
 Report existing debt and a repair plan; do not lower agreed thresholds or mark
 missing evidence as successful. For custom rules use
 [the lint recipe](references/custom-lints.md).
+
+Use companion skills when installed and relevant: `spec-to-code-compliance` for
+an explicitly scoped requirements audit, `semgrep-rule-creator` for custom rules,
+`property-based-testing` for meaningful Hypothesis properties, and `mutation-testing`
+for bounded mutmut setup or result analysis. Each is a standalone folder in this
+checkout's `skills` directory; do not assume it was installed with this skill.
+Their presence does not authorize a full audit, mutation campaign or tool migration.
+New scaffolds propose Vulture and Complexipy as required static checks; preserve
+agreed existing tools on adoption. Complexipy's default cognitive limit is 15,
+with no inline-ignore bypass; describe threshold changes as policy changes.
+Scaffolds also enable Ruff C901 at 10 and tested ast-grep rules. Their negative
+snippets are YAML outside source/tests, and all rule/config/fixture/snapshot inputs
+are fingerprinted. Preserve a user-selected alternative engine during adoption.
 
 Run the configured groups and audit. Ordinary checks must not launch deep mutation
 or benchmark workloads. Respect time/output budgets and avoid RAM-backed temp trees.

@@ -1,0 +1,14 @@
+id: no-shell-command
+snapshots:
+  subprocess.Popen("echo ok", shell=True):
+    labels:
+    - source: subprocess.Popen("echo ok", shell=True)
+      style: primary
+      start: 0
+      end: 39
+  subprocess.run("echo ok", shell=True, timeout=5):
+    labels:
+    - source: subprocess.run("echo ok", shell=True, timeout=5)
+      style: primary
+      start: 0
+      end: 48

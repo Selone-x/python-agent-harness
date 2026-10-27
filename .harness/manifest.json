@@ -14,26 +14,26 @@
     },
     ".harness/policy.md": {
       "block": false,
-      "hash": "e7c2f5d4ea2b1df2cfb9b37a24754db7a6fef5ad9703827f9bbd42da7086bb39"
+      "hash": "a2c25751d40a36e2f8e0ca49a86e67c97648f56ad9c7ea5d7e1a6860df248bdb"
     },
     ".harness/pre-commit-config.yaml": {
       "block": false,
-      "hash": "45532a73ea42e1c2016de6fb278a39d51a43e3124235ca1700185ee34dac73d5"
+      "hash": "b9c2c57cbba490e4e54ddb4bdccaf7e3222403949eb7ce0c7bded49d0393e5be"
     },
     ".harness/runner.pyz": {
       "block": false,
-      "hash": "823b6ccdf56505b41e6b63f1d42275907f80954dce3b29f1887e48c1019a8cdf"
+      "hash": "b4fafcb2006f7c95c5f87f0bcf538c6665b6f85baec112a8cb2d045d2a9450cc"
     },
     "AGENTS.md": {
       "block": true,
-      "hash": "9cb411e62009b1314b0d5251c57351e1dacac0ad47ba82edc8b5350c8491638c"
+      "hash": "feb4e0934a826eb9613ddf1949b7f83a894ae833c60b7bd853076f9ae71df3e1"
     },
     "CLAUDE.md": {
       "block": true,
       "hash": "e383efed82a776fba4dc3aa8b08aabf0edbae2901cd93bb28ef9c11ff16ec903"
     }
   },
-  "policy": "72b90da25ca8119dfb0f9f5457161a86f600c90aefbd6a936075e930e116003b",
+  "policy": "d4e88cb0ce1515e0161239ce29f9a2f8e1b99f4d2ef84617375633b32138db3a",
   "schema_version": 1,
   "version": "0.1.0"
 }

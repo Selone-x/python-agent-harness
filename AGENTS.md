@@ -2,6 +2,8 @@
 
 Read rules/code.md, rules/architecture.md, rules/testing.md and rules/tooling.md.
 Run Python commands through uv; install the locked environment with `just setup`.
+The isolated stdlib runner may use standalone Python for bootstrap/pre-commit/CI;
+its configured tool commands still use the project's locked environment.
 Work in a feature branch. Never commit or push directly to main. Merge only
 through a PR/MR whose latest commit passed required CI.
 
@@ -15,6 +17,7 @@ The public license is undecided; publication is a separate, unfinished step.
 
 <!-- python-agent-harness:begin -->
 Read `.harness/policy.md` and `.harness/project.toml`.
-Run `python -I .harness/runner.pyz validate` and the configured check groups.
+Use `just check` for the same bounded groups and gate as CI.
+The stdlib runner may use standalone Python for bootstrap before tool setup.
 Keep existing guidelines. Policy/CI changes need explicit review.
 <!-- python-agent-harness:end -->

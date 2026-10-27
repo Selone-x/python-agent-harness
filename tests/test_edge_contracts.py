@@ -218,7 +218,7 @@ def test_package_archive_and_isolated_wheel_import(project: Path) -> None:
 def test_provider_api_never_echoes_credentials(
     project: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    def denied(argv: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+    def denied(argv: list[str], **_kwargs: object) -> subprocess.CompletedProcess[str]:
         return subprocess.CompletedProcess(argv, 1, stdout="private token", stderr="private token")
 
     monkeypatch.setattr(providers.subprocess, "run", denied)
@@ -226,7 +226,7 @@ def test_provider_api_never_echoes_credentials(
         providers.api(project, "github", "repos/example/project")
     assert "private token" not in str(failure.value)
 
-    def unavailable(argv: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+    def unavailable(argv: list[str], **_kwargs: object) -> subprocess.CompletedProcess[str]:
         raise FileNotFoundError("private token")
 
     monkeypatch.setattr(providers.subprocess, "run", unavailable)

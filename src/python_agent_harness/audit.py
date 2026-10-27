@@ -80,6 +80,17 @@ def reachable(graph: dict[str, tuple[str, ...]], start: str) -> set[str]:
     return visited
 
 
+def forbidden_dependencies(
+    graph: dict[str, tuple[str, ...]], start: str, prefixes: tuple[str, ...]
+) -> tuple[str, ...]:
+    """Query forbidden transitive targets, preserving deterministic diagnostic order."""
+    return tuple(
+        target
+        for target in sorted(reachable(graph, start))
+        if any(matches(target, prefix) for prefix in prefixes)
+    )
+
+
 def architecture(root: Path, spec: Spec) -> tuple[Finding, ...]:
     """Check declared forbidden edges, including static transitive dependencies."""
     graph = dependency_graph(root, spec)
@@ -95,32 +106,23 @@ def architecture(root: Path, spec: Spec) -> tuple[Finding, ...]:
                 )
             )
         for name in selected:
-            for target in sorted(reachable(graph, name)):
-                if any(matches(target, prefix) for prefix in boundary.forbidden):
-                    findings.append(
-                        Finding(
-                            code="architecture.import",
-                            status="fail",
-                            message=f"{name} depends on forbidden {target}",
-                        )
-                    )
+            findings.extend(
+                Finding(
+                    code="architecture.import",
+                    status="fail",
+                    message=f"{name} depends on forbidden {target}",
+                )
+                for target in forbidden_dependencies(graph, name, boundary.forbidden)
+            )
     return tuple(findings)
 
 
-def ownership(root: Path) -> tuple[Finding, ...]:
-    """Detect edited generated files and policy changes since last rendering."""
-    manifest = inside(root, MANIFEST)
-    if not manifest.exists():
-        return (
-            Finding(code="render.missing", status="fail", message="Run render and review its diff"),
-        )
-    data = json.loads(manifest.read_text(encoding="utf-8"))
-    if not isinstance(data, dict) or not isinstance(data.get("files"), dict):
-        raise HarnessError("Invalid ownership manifest")
-    findings: list[Finding] = []
+def artifact_drift(root: Path, records: dict[str, object]) -> tuple[Finding, ...]:
+    """Compare manifest records with files and managed blocks without writing."""
     from .render import block_content
 
-    for name, expected in data["files"].items():
+    findings: list[Finding] = []
+    for name, expected in records.items():
         path = inside(root, name)
         if not isinstance(expected, dict) or set(expected) != {"hash", "block"}:
             raise HarnessError("Invalid manifest record")
@@ -136,6 +138,20 @@ def ownership(root: Path) -> tuple[Finding, ...]:
                     path=name,
                 )
             )
+    return tuple(findings)
+
+
+def ownership(root: Path) -> tuple[Finding, ...]:
+    """Detect edited generated files and policy changes since last rendering."""
+    manifest = inside(root, MANIFEST)
+    if not manifest.exists():
+        return (
+            Finding(code="render.missing", status="fail", message="Run render and review its diff"),
+        )
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or not isinstance(data.get("files"), dict):
+        raise HarnessError("Invalid ownership manifest")
+    findings = list(artifact_drift(root, data["files"]))
     policy = inside(root, ".harness/project.toml")
     if data.get("policy") != digest(policy.read_bytes()):
         findings.append(
@@ -249,11 +265,10 @@ def audit_project(root: Path, spec: Spec) -> tuple[Finding, ...]:
     return findings
 
 
-def fingerprint(root: Path, spec: Spec) -> str:
-    """Bind a command report to policy, source, tests and the current runner."""
-    paths = set(source_files(root, spec.sources))
-    extras = (*spec.inputs, *(name for rule in spec.requirements for name in rule.evidence))
-    for name in extras:
+def declared_inputs(root: Path, names: tuple[str, ...]) -> set[Path]:
+    """Inventory required evidence/extensions, rejecting missing and escaping paths."""
+    paths: set[Path] = set()
+    for name in names:
         path = inside(root, name)
         if not path.exists():
             raise HarnessError(f"Missing declared input: {name}")
@@ -261,6 +276,14 @@ def fingerprint(root: Path, spec: Spec) -> str:
             checked = inside(root, candidate.relative_to(root).as_posix())
             if checked.is_file():
                 paths.add(checked)
+    return paths
+
+
+def fingerprint(root: Path, spec: Spec) -> str:
+    """Bind a command report to policy, source, tests and the current runner."""
+    paths = set(source_files(root, spec.sources))
+    extras = (*spec.inputs, *(name for rule in spec.requirements for name in rule.evidence))
+    paths.update(declared_inputs(root, extras))
     for name in spec.tests:
         if inside(root, name).exists():
             paths.update(source_files(root, (name,)))

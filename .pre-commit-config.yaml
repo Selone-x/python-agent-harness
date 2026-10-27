@@ -1,13 +1,9 @@
 repos:
   - repo: local
     hooks:
-      - id: ruff
-        name: Ruff
-        entry: uv run --locked ruff check
+      - id: harness-static
+        name: Harness static checks
+        entry: python3 -I .harness/runner.pyz check --group static
         language: system
-        types: [python]
-      - id: format
-        name: Ruff format
-        entry: uv run --locked ruff format --check
-        language: system
-        types: [python]
+        pass_filenames: false
+        always_run: true
