@@ -12,3 +12,7 @@ Ruff enforces formatting, common defects, types at boundaries and complexity.
 Local suppressions need a rule code and explanation. Apply quality rules to
 tests and tools too. Do not introduce architecture-specific Result/DTO rules
 into consumer projects without agreement.
+
+Complexipy also checks source and tests at cognitive complexity <=15, with inline
+ignore comments disabled. Preserve existing cyclomatic limits. Refactor coherent
+responsibilities rather than splitting assertions or raising thresholds for green.

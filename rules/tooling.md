@@ -3,6 +3,12 @@
 Use `just setup`, `just fmt`, targeted pytest, then `just check`. Generated files,
 logs and caches belong in ignored disk-backed directories. Keep uv.lock committed.
 
+`just check` and CI run the same specification groups through the bounded runner;
+the gate requires their current reports. Pre-commit runs the same static group,
+including formatting, types and rule fixtures, and never launches the tests/deep
+groups. Use standalone Python only for the stdlib runner bootstrap; installed
+Python tools run through uv. Report logs are bounded, not arbitrary workload files.
+
 All application and policy changes use feature branches and PRs/MRs. Start each
 description with a short summary of what changed, why, and the resulting behavior.
 Describe validation and compatibility below it. Do not disable checks, lower

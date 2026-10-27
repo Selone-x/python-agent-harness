@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="390" viewBox="0 0 1200 390" role="img" aria-labelledby="title description">
+  <title id="title">Give your agent a quality bar</title>
+  <desc id="description">A workflow from agreed project requirements to a specification, bounded checks and reviewable evidence.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#111b2e"/>
+      <stop offset="1" stop-color="#0a1120"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#70e5c0"/>
+      <stop offset="1" stop-color="#a8b9ff"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#8494bb" stroke-opacity="0.055"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="390" rx="22" fill="url(#background)"/>
+  <rect width="1200" height="390" rx="22" fill="url(#grid)"/>
+  <rect x="1" y="1" width="1198" height="388" rx="21" fill="none" stroke="#2b3850"/>
+  <path d="M54 65h15l8-14 13 28 9-14h16" fill="none" stroke="url(#accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="DejaVu Sans, sans-serif">
+    <text x="132" y="70" fill="#bdc9e3" font-size="13" font-weight="600" letter-spacing="2.5">PYTHON AGENT HARNESS</text>
+    <text x="56" y="146" fill="#f3f6ff" font-size="48" font-weight="700" letter-spacing="-1.5">Build with an agent.</text>
+    <text x="56" y="204" fill="url(#accent)" font-size="48" font-weight="700" letter-spacing="-1.5">Review with evidence.</text>
+    <text x="58" y="239" fill="#a8b6d0" font-size="17">Your architecture. Your checks. A repeatable path to CI.</text>
+    <g transform="translate(866 57)">
+      <rect width="276" height="166" rx="12" fill="#111d30" stroke="#33415a"/>
+      <path d="M1 37h274" stroke="#33415a"/>
+      <circle cx="17" cy="19" r="3.5" fill="#52617e"/>
+      <circle cx="30" cy="19" r="3.5" fill="#52617e"/>
+      <circle cx="43" cy="19" r="3.5" fill="#52617e"/>
+      <text x="20" y="70" fill="#78e5c3" font-size="16" font-family="DejaVu Sans Mono, monospace">$ just check</text>
+      <text x="20" y="103" fill="#d2ddf2" font-size="13">specification</text>
+      <text x="20" y="125" fill="#d2ddf2" font-size="13">configured checks</text>
+      <text x="20" y="147" fill="#d2ddf2" font-size="13">current evidence</text>
+      <path d="M246 94v9m-4-4h8M246 116v9m-4-4h8M246 138v9m-4-4h8" stroke="#78e5c3" stroke-width="1.5"/>
+    </g>
+    <path d="M244 316h51m246 0h51m246 0h51" fill="none" stroke="#4d6385" stroke-width="1.5"/>
+    <path d="m288 312 7 4-7 4m297-8 7 4-7 4m297-8 7 4-7 4" fill="none" stroke="#4d6385" stroke-width="1.5"/>
+    <g transform="translate(56 284)">
+      <rect width="188" height="64" rx="10" fill="#152c31" stroke="#325d59"/>
+      <text x="18" y="24" fill="#81e2c5" font-size="10" font-weight="700" letter-spacing="1.8">01 / AGREE</text>
+      <text x="18" y="46" fill="#e2f5ef" font-size="15">Project requirements</text>
+    </g>
+    <g transform="translate(295 284)">
+      <rect width="246" height="64" rx="10" fill="#142236" stroke="#33465f"/>
+      <text x="18" y="24" fill="#a9c4eb" font-size="10" font-weight="700" letter-spacing="1.8">02 / DEFINE</text>
+      <text x="18" y="46" fill="#e1e9f7" font-size="15">Executable specification</text>
+    </g>
+    <g transform="translate(592 284)">
+      <rect width="246" height="64" rx="10" fill="#142236" stroke="#33465f"/>
+      <text x="18" y="24" fill="#a9c4eb" font-size="10" font-weight="700" letter-spacing="1.8">03 / RUN</text>
+      <text x="18" y="46" fill="#e1e9f7" font-size="15">Bounded local + CI checks</text>
+    </g>
+    <g transform="translate(889 284)">
+      <rect width="253" height="64" rx="10" fill="#24253f" stroke="#494b72"/>
+      <text x="18" y="24" fill="#c4baff" font-size="10" font-weight="700" letter-spacing="1.8">04 / REVIEW</text>
+      <text x="18" y="46" fill="#eeebff" font-size="15">Evidence you can inspect</text>
+    </g>
+  </g>
+</svg>

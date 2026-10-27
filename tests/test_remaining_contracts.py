@@ -167,7 +167,7 @@ def test_test_gate_requires_all_coverage_findings(project: Path) -> None:
 def test_read_only_api_success_and_cli_doctor(
     project: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    def query(argv: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+    def query(argv: list[str], **_kwargs: object) -> subprocess.CompletedProcess[str]:
         return subprocess.CompletedProcess(argv, 0, stdout='{"available": true}')
 
     monkeypatch.setattr(providers.subprocess, "run", query)

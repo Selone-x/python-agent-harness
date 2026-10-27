@@ -7,6 +7,8 @@ Requirements:
 - bounded-commands [test]: Observe real exits and stop timeouts/output floods without leaving workers.
 - preserve-user-content [test]: Refuse unowned conflicts and preserve instructions outside managed blocks.
 - custom-lint-engine [test]: Run positive and negative project-rule examples through real Fixit.
+- dead-code-detection [check]: Reject unused code at the agreed Vulture confidence, scanning source and tests together.
+- cognitive-complexity [check]: Reject functions above cognitive complexity 15 in source and tests, without ignore comments.
 - independent-oracle [review]: Review test expectations against documented contracts and literal boundary examples.
 
 Coverage: lines >= 97%; branches >= 100%.

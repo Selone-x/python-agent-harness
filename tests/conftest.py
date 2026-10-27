@@ -1,8 +1,26 @@
 """Small, disk-backed projects with literal independent expected counters."""
 
+import os
 from pathlib import Path
 
 import pytest
+from hypothesis import settings
+
+from python_agent_harness.bootstrap import HYPOTHESIS_PROFILES
+
+(Path(__file__).resolve().parents[1] / ".reports").mkdir(parents=True, exist_ok=True)
+
+for profile_name, examples, steps in HYPOTHESIS_PROFILES:
+    settings.register_profile(
+        profile_name,
+        max_examples=examples,
+        stateful_step_count=steps,
+        print_blob=True,
+        deadline=200,
+        suppress_health_check=(),
+        derandomize=profile_name != "dev",
+    )
+settings.load_profile(os.environ.get("HYPOTHESIS_PROFILE", "dev"))
 
 BASE = """schema_version = 1
 name = "example"

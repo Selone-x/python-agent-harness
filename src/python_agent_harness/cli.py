@@ -13,6 +13,7 @@ from .config import load
 from .coverage import verify_coverage
 from .discovery import inspect_project
 from .model import Finding, successful
+from .mutations import mutation_gate
 from .package import verify_package
 from .paths import HarnessError
 from .providers import doctor
@@ -44,6 +45,10 @@ def parser() -> argparse.ArgumentParser:
     checking.add_argument("--group", choices=("static", "tests", "package", "deep"))
     modes.add_parser("audit", help="Inspect drift, suppressions, architecture and evidence")
     modes.add_parser("gate", help="Require successful, current evidence from every required group")
+    mutation = modes.add_parser(
+        "mutation-gate", help="Verify complete mutmut results; never start a mutation campaign"
+    )
+    mutation.add_argument("argv", nargs=argparse.REMAINDER, help="Optional results argv after --")
     modes.add_parser(
         "coverage", help="Verify exact coverage ratios and the complete source inventory"
     )
@@ -151,6 +156,9 @@ def inspect_commands(root: Path, args: argparse.Namespace) -> int:
         emit({"status": "pass", "module": args.module})
         return 0
     spec = load(root)
+    if args.mode == "mutation-gate":
+        argv = tuple(args.argv[1:] if args.argv[:1] == ["--"] else args.argv)
+        return findings_result(mutation_gate(root, spec, argv))
     if args.mode == "coverage":
         return findings_result(verify_coverage(root, spec))
     if args.mode == "audit":

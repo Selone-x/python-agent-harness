@@ -77,7 +77,8 @@ def artifacts(spec: Spec) -> tuple[Artifact, ...]:
     """Generate common outputs plus the selected provider integrations."""
     instructions = (
         f"{BEGIN}\nRead `.harness/policy.md` and `.harness/project.toml`.\n"
-        "Run `python -I .harness/runner.pyz validate` and the configured check groups.\n"
+        "Use `just check` for the same bounded groups and gate as CI.\n"
+        "The stdlib runner may use standalone Python for bootstrap before tool setup.\n"
         f"Keep existing guidelines. Policy/CI changes need explicit review.\n{END}\n"
     )
     result = [
@@ -94,9 +95,9 @@ def artifacts(spec: Spec) -> tuple[Artifact, ...]:
             content=b"""repos:
   - repo: local
     hooks:
-      - id: harness-policy
-        name: Harness policy and architecture
-        entry: python -I .harness/runner.pyz audit
+      - id: harness-static
+        name: Harness static checks
+        entry: python3 -I .harness/runner.pyz check --group static
         language: system
         pass_filenames: false
         always_run: true
@@ -152,6 +153,22 @@ def previous_manifest(root: Path) -> dict[str, dict[str, object]]:
     return records
 
 
+def prepare_artifact(
+    path: Path, artifact: Artifact, expected: dict[str, object] | None
+) -> tuple[bytes, bytes]:
+    """Validate one artifact's ownership and compute its update without writes."""
+    old = path.read_bytes() if path.exists() else b""
+    actual = block_content(old) if expected and expected["block"] else old
+    if expected and digest(actual) != expected["hash"]:
+        raise HarnessError(f"Conflict in edited generated content: {artifact.path}")
+    if path.exists() and not expected and not artifact.block and old != artifact.content:
+        raise HarnessError(f"Refusing to overwrite unowned file: {artifact.path}")
+    if artifact.block and not expected and (BEGIN.encode() in old or END.encode() in old):
+        raise HarnessError(f"Unowned managed block: {artifact.path}")
+    content = merge_block(old, artifact.content) if artifact.block else artifact.content
+    return old, content
+
+
 def plan(root: Path, spec: Spec) -> dict[str, bytes]:
     """Calculate every update and conflict without changing the working tree."""
     previous = previous_manifest(root)
@@ -175,16 +192,7 @@ include:
     records: dict[str, dict[str, object]] = {}
     for artifact in outputs:
         path = inside(root, artifact.path)
-        old = path.read_bytes() if path.exists() else b""
-        expected = previous.get(artifact.path)
-        actual = block_content(old) if expected and expected["block"] else old
-        if expected and digest(actual) != expected["hash"]:
-            raise HarnessError(f"Conflict in edited generated content: {artifact.path}")
-        if path.exists() and not expected and not artifact.block and old != artifact.content:
-            raise HarnessError(f"Refusing to overwrite unowned file: {artifact.path}")
-        if artifact.block and not expected and (BEGIN.encode() in old or END.encode() in old):
-            raise HarnessError(f"Unowned managed block: {artifact.path}")
-        content = merge_block(old, artifact.content) if artifact.block else artifact.content
+        old, content = prepare_artifact(path, artifact, previous.get(artifact.path))
         owned = block_content(content) if artifact.block else content
         records[artifact.path] = {"hash": digest(owned), "block": artifact.block}
         if content != old or not path.exists():

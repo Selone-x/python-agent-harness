@@ -31,6 +31,38 @@ within a selected group is mandatory. `@python` is the runner interpreter;
 `@harness` invokes the project's isolated bundled runtime. Other argv values are
 literal arguments; shell expansion is never performed.
 
+Both `just check` and CI execute those groups through the same bounded runner and
+aggregate gate. Pre-commit runs only the static group. New scaffolds set pytest's
+workspace temp root in config as well as the behavior command, so direct targeted
+tests retain the resource policy. C901 <=10 complements cognitive complexity <=15.
+
+New scaffolds include real ast-grep rule tests, reviewed diagnostic snapshots and
+a source scan. Rule/config/fixture/snapshot paths are declared `inputs`; negative
+examples are YAML outside production/test Python roots. Semgrep Python fixtures
+need their own narrow exclusion if the existing broad Python scans would parse them.
+
+New scaffolds configure Vulture in `static` and offer Schemathesis in the optional
+`api` dependency group. `.harness/api-check.example.toml` is an inactive example:
+copy its check into the specification after agreeing the schema and test target.
+Keep its `deep` group for explicit runs, or choose `tests` to require it in ordinary
+CI and arrange service startup there. Add schema/config/hooks to `inputs` so API
+evidence cannot remain current after those inputs change. Service lifecycle and
+business invariants are project-specific; API schema fuzzing does not establish them.
+
+Complexipy is another required scaffold static check. Its inclusive cognitive
+limit is 15 for source and tests, with `no-ignore = true` and report-local caches.
+Existing-project adoption keeps existing complexity tooling unless changed by
+agreement. The optional `mutation` dependency group pins compatible mutmut 3.7.0;
+it does not create or run a campaign. A mutation deep workflow needs narrow paths,
+one worker, finite process/output budgets and a separate acceptance check that
+examines actual outcomes rather than relying on `mutmut run` returning zero.
+
+`.harness/mutation-check.example.toml` supplies the optional one-worker 60-second
+engine check and following `@harness mutation-gate` check. This strict preset reads
+a bounded complete inventory and accepts only nonempty, unique, well-formed killed
+results. All other statuses fail. It never starts a campaign by itself. A different
+equivalence/acceptance policy requires an explicit reviewed adapter.
+
 `quality` accepts `lines`, `branches`, `coverage`, `output_limit` and `deep_budget`.
 Percentages use exact decimal arithmetic; defaults are 97 and 100. Budgets are
 positive integers. The test command must produce fresh coverage.py JSON at the

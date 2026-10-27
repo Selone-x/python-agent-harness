@@ -11,5 +11,10 @@ validator is not a behavioral evaluation.
 
 Use workspace temporary paths, fixed Hypothesis profiles, one test process and
 bounded subprocesses. No full mutation/performance run is implicit in `just check`.
+Profiles shared with scaffolds are dev 50/25, ci 200/50 and nightly 1000/200
+(examples/stateful steps), with a 200 ms example deadline and health checks enabled.
+Both direct pytest and the harness command keep temporary files in the project.
+ast-grep negative examples are YAML strings under lint-fixtures, outside Python
+source/tests; configuration, fixtures and diagnostic snapshots are explicit inputs.
 Live GitHub/GitLab protection tests require disposable repositories and explicit
 authorization; do not run destructive demonstrations against real main branches.

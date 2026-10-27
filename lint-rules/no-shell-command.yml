@@ -1,0 +1,10 @@
+id: no-shell-command
+language: Python
+severity: error
+message: Pass argv without shell=True; use an explicit bounded process boundary.
+rule:
+  any:
+    - pattern: subprocess.run($$$BEFORE, shell=True, $$$AFTER)
+    - pattern: subprocess.run($$$BEFORE, shell=True)
+    - pattern: subprocess.Popen($$$BEFORE, shell=True, $$$AFTER)
+    - pattern: subprocess.Popen($$$BEFORE, shell=True)

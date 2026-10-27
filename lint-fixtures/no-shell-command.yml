@@ -1,0 +1,8 @@
+id: no-shell-command
+valid:
+  - subprocess.run(["echo", "ok"], timeout=5)
+  - subprocess.run(["echo", "ok"], shell=False, timeout=5)
+  - service.run(command, shell=True)
+invalid:
+  - subprocess.run("echo ok", shell=True, timeout=5)
+  - subprocess.Popen("echo ok", shell=True)
