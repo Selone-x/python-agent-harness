@@ -5,7 +5,7 @@ python = "3.13"
 description = "Project-specific harness construction with explicit enforcement limits and no hosted service."
 sources = ["src/python_agent_harness"]
 tests = ["tests"]
-inputs = ["skills", "rules", "justfile", ".pre-commit-config.yaml", "lint-rules", "lint-fixtures", "sgconfig.yml"]
+inputs = ["skills", "rules", "justfile", ".pre-commit-config.yaml", "lint-rules", "lint-fixtures", "sgconfig.yml", "tools", "assets"]
 providers = ["github", "gitlab"]
 setup = [["uv", "sync", "--locked"]]
 
@@ -67,7 +67,7 @@ timeout = 30
 [[checks]]
 id = "project-rules"
 group = "static"
-argv = ["uv", "run", "--locked", "ast-grep", "scan", "--error", "src", "tests"]
+argv = ["uv", "run", "--locked", "ast-grep", "scan", "--error", "src", "tests", "tools"]
 timeout = 30
 
 [[checks]]

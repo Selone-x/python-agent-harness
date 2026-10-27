@@ -73,14 +73,14 @@ precision = 2
 exclude_also = ["if __name__ == .__main__.:" ]
 
 [tool.ty.src]
-include = ["src", "tests"]
+include = ["src", "tests", "tools"]
 
 [tool.vulture]
-paths = ["src", "tests"]
+paths = ["src", "tests", "tools"]
 min_confidence = 80
 
 [tool.complexipy]
-paths = ["src", "tests"]
+paths = ["src", "tests", "tools"]
 max-complexity-allowed = 15
 no-ignore = true
 failed = true

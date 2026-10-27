@@ -75,3 +75,26 @@ trigger is subtle.
 Preserve the target project's tool choices during adoption. Describe policy, CI,
 threshold and exclusion changes separately for review. Fix the cause of a failed
 check; keep the agreed checks and test expectations intact.
+
+## Rebuild the README animations
+
+The GIFs are narrated replays of a verified isolated example, with summarized
+terminal output. The fee test expects `100 - 7 == 93`; the incorrect source returns
+107, and correcting the source passes the same tests. The installation sequence
+was also exercised in an isolated checkout, including the initial scaffold checks.
+These examples do not certify arbitrary project requirements.
+
+To change the visuals or captions, edit the scene definitions and SVG rendering in
+[tools/render_readme_media.py](tools/render_readme_media.py), then run:
+
+```sh
+uv run --locked python tools/render_readme_media.py
+```
+
+Rendering requires `rsvg-convert` and `ffmpeg` on PATH. It installs no environments,
+runs sequentially with bounded logs/timeouts, keeps frames in `.harness/reports/`
+and uses one ffmpeg thread. Review both static SVG posters and representative
+frames of each GIF. Verify any changed commands or outcome claims against real
+execution before updating the scenes, then run `just check`.
+The generator participates in static checks, and tools/assets are explicit report
+inputs so changes invalidate earlier evidence.
