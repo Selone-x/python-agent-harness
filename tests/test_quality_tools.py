@@ -1,6 +1,7 @@
 """Real engines accept valid code/responses and reject deliberate violations."""
 
 import json
+import os
 import subprocess
 import sys
 import tomllib
@@ -59,9 +60,20 @@ def invalid_api(_request: Request) -> Response:
     return Response('"wrong type"', mimetype="application/json")
 
 
+@pytest.fixture(scope="module")
+def _ready_contract_validator() -> None:
+    """Initialize lazy schema checks before Hypothesis times generated examples."""
+    case = SCHEMA["/echo"]["GET"].Case(query={"value": 0})
+    response = case.call_and_validate(app=valid_api)
+
+    assert response.status_code == 200
+
+
 @settings(max_examples=5, derandomize=True, database=None)
 @given(case=SCHEMA["/echo"]["GET"].as_strategy())
-def test_schemathesis_generated_requests_satisfy_local_contract(case: schemathesis.Case) -> None:
+def test_schemathesis_generated_requests_satisfy_local_contract(
+    _ready_contract_validator: None, case: schemathesis.Case
+) -> None:
     response = case.call_and_validate(app=valid_api)
 
     assert response.status_code == 200
@@ -72,6 +84,53 @@ def test_schemathesis_rejects_a_response_with_the_wrong_type() -> None:
 
     with pytest.raises(FailureGroup, match="Response violates schema"):
         case.call_and_validate(app=invalid_api)
+
+
+def test_schemathesis_initialization_is_outside_generated_example_deadlines(tmp_path: Path) -> None:
+    plugin = tmp_path / "delayed_contract_validator.py"
+    plugin.write_text(
+        "import time\nimport schemathesis\n\n"
+        "original = schemathesis.Case.call_and_validate\n"
+        "first_call = True\n\n"
+        "def delayed(self, *args, **kwargs):\n"
+        "    global first_call\n"
+        "    if first_call:\n"
+        "        first_call = False\n"
+        "        time.sleep(0.35)\n"
+        "    return original(self, *args, **kwargs)\n\n"
+        "schemathesis.Case.call_and_validate = delayed\n"
+    )
+    root = Path(__file__).resolve().parents[1]
+    environment = {
+        **os.environ,
+        "PYTHONPATH": os.pathsep.join((str(tmp_path), str(root / "src"))),
+        "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+        "HYPOTHESIS_PROFILE": "ci",
+    }
+    result = subprocess.run(  # noqa: S603 - controlled plugin and selected test in a bounded child.
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "-o",
+            "addopts=",
+            "-p",
+            "hypothesis.extra.pytestplugin",
+            "-p",
+            "delayed_contract_validator",
+            "tests/test_quality_tools.py::test_schemathesis_generated_requests_satisfy_local_contract",
+            f"--basetemp={tmp_path / 'child-test-tmp'}",
+        ],
+        cwd=root,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=15,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 @pytest.mark.parametrize(
