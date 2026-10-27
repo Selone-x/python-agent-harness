@@ -84,6 +84,12 @@ terminal output. The fee test expects `100 - 7 == 93`; the incorrect source retu
 was also exercised in an isolated checkout, including the initial scaffold checks.
 These examples do not certify arbitrary project requirements.
 
+The primary customization animation shows an illustrated user/agent exchange.
+Its resulting import boundary, forbidden-import failure, corrected audit and full
+project checks were exercised with real CLI commands while preserving the existing
+tool configuration. The agent dialogue and installation prompt are explanatory
+scenes, not recordings of a particular agent host.
+
 To change the visuals or captions, edit the scene definitions and SVG rendering in
 [tools/render_readme_media.py](tools/render_readme_media.py), then run:
 

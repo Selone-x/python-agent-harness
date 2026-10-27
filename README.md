@@ -3,12 +3,12 @@
 <h1 align="center">Fast generation.<br>Slow code review?</h1>
 
 <p align="center">
-  Give your agent feedback before the PR.<br>
-  Turn your team's standards into executable checks, useful tests and current CI evidence.
+  Tell your AI agent how your project should work.<br>
+  Get a harness tailored to your architecture, tools, test invariants and CI.
 </p>
 
 <p align="center">
-  <a href="#from-comments-to-checks">Watch it work</a> &nbsp;·&nbsp;
+  <a href="#tailor-the-harness-with-your-ai-agent">Watch your agent tailor it</a> &nbsp;·&nbsp;
   <a href="#quick-start">Get started</a> &nbsp;·&nbsp;
   <a href="CONTRIBUTING.md">Build with us</a>
 </p>
@@ -17,14 +17,37 @@
 
 “Wrong import direction.” “What does this test actually prove?” “Did you rerun CI?”
 
-Those conversations repeat across pull requests. **Python Agent Harness helps you
-turn recurring feedback into a shared workflow**: agree the requirements with your
-agent, run the checks, fix concrete failures, and bring current evidence to review.
+Those conversations repeat across pull requests. **Describe your standards to your
+AI coding agent and have it build a harness for your project.** The agent inspects
+the repository, preserves your tool choices, proposes rules and tests, and previews
+the configuration before applying the agreed changes.
 
 Use your existing coding agent and Python toolchain. The runtime uses the standard
 library; no additional LLM API key or hosted harness service is required.
 
-## From comments to checks
+## Tailor the harness with your AI agent
+
+![A user describes project rules to their AI agent; the agent proposes checks, prepares a project-specific import boundary and uses the CLI to verify it.](assets/readme-customize.gif)
+
+*Illustrated agent request and proposal; the resulting configuration and CLI
+outcomes were verified in an isolated project.
+[Static version](assets/readme-customize.svg).*
+
+In this example, the request is **keep our tools and keep calculations independent
+of I/O adapters**. The agreed specification forbids `my_project.totals` from
+importing `my_project.adapters`. The audit catches that import; removing it passes
+the same rule, with the existing tool configuration preserved.
+
+You choose the toolchain, architecture boundaries, test invariants, custom lint
+rules, quality thresholds and CI budgets. Your agent turns those decisions into
+project files and executable checks. Requirements that need human judgment stay
+visible for review; the CLI executes the configuration rather than interpreting
+your request or calling an LLM itself.
+
+<details>
+<summary><strong>See independent tests catch a code regression</strong></summary>
+
+### From comments to checks
 
 ![Before and after: an independent flat-fee test catches an incorrect implementation; correcting the source makes the current checks pass.](assets/readme-demo.gif)
 
@@ -39,25 +62,57 @@ and produces passing evidence.
 The harness runs what your project agrees to check. Semantic requirements and the
 quality of test oracles remain explicit review work.
 
+</details>
+
 ## Quick start
 
-### Set it up. See it run.
+### Install the constructor. Give your agent the project.
 
-![Installation: get the constructor, scaffold a project, agree requirements, preview the workflow, install tools and run the initial checks.](assets/readme-install.gif)
+![Setup: get the constructor, create a draft, ask your AI agent to tailor it, preview changes and run the checks.](assets/readme-install.gif)
 
-*Verified commands with condensed playback. The initial version test is a scaffold
-smoke test; add behavior tests for your features.
+*Verified CLI steps with condensed playback and an illustrated agent prompt.
+The initial version test is a scaffold smoke test; add behavior tests for features.
 [Static version](assets/readme-install.svg).*
 
 Requires **Python 3.13+, Git, uv and just** on Linux or macOS. Windows execution is
 currently unsupported.
 
-Get the constructor and create a project in an empty destination:
+Get the constructor:
 
 ```sh
 git clone https://github.com/Selone-x/python-agent-harness
 cd python-agent-harness
 uv sync --locked --no-dev
+```
+
+Open your target project in your existing AI coding agent and give it a request
+like this. Replace the checkout path and example requirements with your own:
+
+```text
+Read /path/to/python-agent-harness/skills/build-python-harness/SKILL.md.
+Build a harness for this project.
+
+Inspect the repository and keep our package manager, formatter and type checker.
+Keep calculations independent of I/O adapters.
+Net total is gross minus the flat fee; derive tests from independent examples.
+
+Propose architecture boundaries, test invariants, custom rules, quality thresholds
+and CI checks. Ask me about decisions the code cannot establish.
+Preview changes before applying the agreed plan in a feature branch.
+Run the real checks and report what passed and what remains unverified.
+```
+
+The agent can create a new project or adopt an existing one. For adoption, it uses
+`inspect` and `init` without `--scaffold`, and configures your real commands. You can
+also install the skill in your agent's skill directory; see
+[skill installation](docs/usage.md#install-the-skills).
+
+<details>
+<summary><strong>Run the CLI steps yourself for a new project</strong></summary>
+
+From the constructor checkout, create a project in an empty destination:
+
+```sh
 uv run --locked --no-dev harness --root ../my-project init \
   --name my-project --package my_project --kind library \
   --provider github --scaffold
@@ -86,6 +141,8 @@ Commit the generated `uv.lock` in your feature branch. CI uses that lock. Each
 project carries its own `.harness/runner.pyz`, so it can run checks independently
 of this checkout. Choose `service`, `cli` or `research` for other project kinds;
 use `--provider gitlab`, or both providers, for the corresponding CI.
+
+</details>
 
 **Already have a project?** Start with `inspect`, then `init` without `--scaffold`.
 Keep the existing formatter, type checker and package manager; agree their real

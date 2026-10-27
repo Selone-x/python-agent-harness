@@ -3,6 +3,7 @@
 Requires rsvg-convert and ffmpeg. Frames/logs stay in .harness/reports;
 rendering is sequential and ffmpeg uses one thread. No environments are installed.
 The example outcomes were verified against the generated library's real checks.
+Agent request/proposal scenes are illustrations, not agent-host recordings.
 """
 
 from dataclasses import dataclass
@@ -26,6 +27,69 @@ class Scene:
     note: str
     lines: tuple[str, ...]
 
+
+CUSTOMIZE = (
+    Scene(
+        title="Describe your project to your AI agent.",
+        note="Illustrated request: use your existing coding agent with the harness skill.",
+        lines=(
+            "# YOUR AGENT'S PLAN (ILLUSTRATED)",
+            "Inspect the code and existing tools.",
+            "Propose checks for your requirements.",
+            "Ask about decisions the code cannot settle.",
+        ),
+    ),
+    Scene(
+        title="Agree a harness tailored to your project.",
+        note="Choose tools, architecture rules, test invariants and CI policy together.",
+        lines=(
+            "# PROPOSED PROJECT RULES",
+            "Keep the existing formatter and type checker.",
+            "Calculations must not import I/O adapters.",
+            "Net total = gross - fee; expected 100 - 7 = 93.",
+        ),
+    ),
+    Scene(
+        title="Review the specification your agent prepares.",
+        note="This exact import boundary was validated in the isolated example.",
+        lines=(
+            "# .harness/project.toml",
+            "[[boundaries]]",
+            'source = "my_project.totals"',
+            'forbidden = ["my_project.adapters"]',
+        ),
+    ),
+    Scene(
+        title="Preview the agreed changes, then apply them.",
+        note="CLI commands are abbreviated here; full commands are in the guide.",
+        lines=(
+            "$ uv run ... harness render",
+            "# Review the proposed files.",
+            "$ uv run ... harness render --apply",
+            "+ Project-specific workflow applied.",
+        ),
+    ),
+    Scene(
+        title="Your rule catches a forbidden dependency.",
+        note="Observed audit failure from the actual configured example.",
+        lines=(
+            "$ uv run ... harness audit",
+            "! architecture.import     FAIL",
+            "my_project.totals depends on",
+            "! forbidden my_project.adapters",
+        ),
+    ),
+    Scene(
+        title="Keep your rule. Correct the implementation.",
+        note="Removing the import passes the same audit; existing tools are preserved.",
+        lines=(
+            "$ uv run ... harness audit",
+            "+ audit                   PASS",
+            "# The boundary remains in project.toml.",
+            "+ Full project checks also pass.",
+        ),
+    ),
+)
 
 SOLUTION = (
     Scene(
@@ -101,13 +165,13 @@ INSTALL = (
         ),
     ),
     Scene(
-        title="Agree the requirements before generating CI.",
-        note="Set purpose, source roots, boundaries and acceptance criteria.",
+        title="Ask your AI agent to tailor the draft.",
+        note="Illustrated prompt: your agent reads the skill and inspects the project.",
         lines=(
-            "# Review .harness/project.toml with your agent.",
-            "$ uv run --locked --no-dev harness \\",
-            "    --root ../my-project validate",
-            "+ Specification validated; review requirements visible.",
+            "# IN YOUR EXISTING CODING AGENT",
+            "Read .../skills/build-python-harness/SKILL.md",
+            "Keep our tools. Agree architecture and test invariants.",
+            "Propose checks; preview changes before applying.",
         ),
     ),
     Scene(
@@ -181,7 +245,17 @@ def shell(scene: Scene, index: int, mode: str) -> str:
             box(40 + number * 174, 569, 160, 5, "#69d7b1" if number <= index else "#27374a")
         )
     result.append(
-        text(40, 609, "ISOLATED EXAMPLE  /  ACTUAL OUTCOMES  /  SUMMARIZED PLAYBACK", 12, "#8398b4")
+        text(
+            40,
+            609,
+            {
+                "agent": "ILLUSTRATED AGENT WORKFLOW / VERIFIED CONFIGURATION AND CLI CHECKS",
+                "install": "VERIFIED CLI STEPS / AGENT PROMPT ILLUSTRATED",
+                "workflow": "ISOLATED EXAMPLE / ACTUAL OUTCOMES / SUMMARIZED PLAYBACK",
+            }[mode],
+            12,
+            "#8398b4",
+        )
     )
     return "".join(result)
 
@@ -216,6 +290,23 @@ def solution(scene: Scene, index: int, visible: int) -> str:
         box(460, 158, 620, 376, "#142f2a", "#31584e"),
         text(481, 193, "AFTER / EXECUTABLE FEEDBACK", 13, "#83dfbc"),
         terminal(478, 210, 584, scene, visible, 17, height=305),
+    ]
+    return "".join(result) + "</svg>"
+
+
+def customization(scene: Scene, index: int, visible: int) -> str:
+    result = [
+        shell(scene, index, "agent"),
+        box(40, 158, 398, 376, "#182638", "#354d6b"),
+        text(61, 193, "YOU / PROJECT REQUIREMENTS", 13, "#b0ccf2"),
+        text(63, 250, "Keep our existing tools.", 18),
+        text(63, 295, "Calculations must not", 18),
+        text(63, 326, "depend on I/O adapters.", 18),
+        text(63, 371, "Net total = gross - fee.", 18, "#b0ccf2"),
+        text(63, 474, "Your project. Your agreed rules.", 16, "#99b5d8"),
+        box(460, 158, 620, 376, "#142f2a", "#31584e"),
+        text(481, 193, "AI AGENT / TAILORED HARNESS", 13, "#83dfbc"),
+        terminal(478, 210, 584, scene, visible, 16, height=305),
     ]
     return "".join(result) + "</svg>"
 
@@ -306,7 +397,7 @@ def render(name: str, scenes: tuple[Scene, ...], poster: str) -> None:
     folder = WORK / name
     folder.mkdir(parents=True, exist_ok=True)
     frames = []
-    painter = solution if name == "demo" else installation
+    painter = {"customize": customization, "demo": solution, "install": installation}[name]
     for index, scene in enumerate(scenes):
         for visible in range(1, len(scene.lines) + 1):
             number = len(frames)
@@ -330,6 +421,7 @@ def render(name: str, scenes: tuple[Scene, ...], poster: str) -> None:
 
 
 def main() -> None:
+    render("customize", CUSTOMIZE, "readme-customize.svg")
     render("demo", SOLUTION, "readme-hero.svg")
     render("install", INSTALL, "readme-install.svg")
 
