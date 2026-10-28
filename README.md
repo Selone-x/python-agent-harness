@@ -27,6 +27,24 @@ library; no additional LLM API key or hosted harness service is required.
 
 ## Tailor the harness with your AI agent
 
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="assets/readme-tailored-static.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme-tailored.svg">
+  <img src="assets/readme-tailored-light.svg" width="960" alt="Your agent reads the existing project and your rules, proposes a plan for your approval, then prepares a project-specific harness and its checks.">
+</picture>
+
+*Illustrated setup workflow: your agent proposes, you approve, and the agreed
+harness runs your checks. [Static diagram](assets/readme-tailored-static.svg).*
+
+You choose the toolchain, architecture boundaries, test invariants, custom lint
+rules, quality thresholds and CI budgets. Your agent turns those decisions into
+project files and executable checks. Requirements that need human judgment stay
+visible for review; the CLI executes the configuration rather than interpreting
+your request or calling an LLM itself.
+
+<details>
+<summary><strong>See a project-specific import rule in action</strong></summary>
+
 ![A user describes project rules to their AI agent; the agent proposes checks, prepares a project-specific import boundary and uses the CLI to verify it.](assets/readme-customize.gif)
 
 *Illustrated agent request and proposal; the resulting configuration and CLI
@@ -38,11 +56,7 @@ of I/O adapters**. The agreed specification forbids `my_project.totals` from
 importing `my_project.adapters`. The audit catches that import; removing it passes
 the same rule, with the existing tool configuration preserved.
 
-You choose the toolchain, architecture boundaries, test invariants, custom lint
-rules, quality thresholds and CI budgets. Your agent turns those decisions into
-project files and executable checks. Requirements that need human judgment stay
-visible for review; the CLI executes the configuration rather than interpreting
-your request or calling an LLM itself.
+</details>
 
 <details>
 <summary><strong>See independent tests catch a code regression</strong></summary>

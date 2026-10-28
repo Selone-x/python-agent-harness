@@ -1,0 +1,171 @@
+{
+  "loop": 10,
+  "accent": "#4CF490",
+  "events": [
+    {
+      "id": "a_code",
+      "kind": "packet",
+      "at": 0.3,
+      "travel": 0.6,
+      "from": [
+        172,
+        176
+      ],
+      "via": [],
+      "to": [
+        232,
+        176
+      ],
+      "glow": {
+        "x": 232,
+        "y": 144,
+        "w": 184,
+        "h": 64,
+        "rx": 7
+      },
+      "color": "#4CF490",
+      "note": "Inspect the existing project"
+    },
+    {
+      "id": "a_rules",
+      "kind": "packet",
+      "at": 1.3,
+      "travel": 0.9,
+      "from": [
+        172,
+        296
+      ],
+      "via": [
+        [
+          204,
+          296
+        ],
+        [
+          204,
+          192
+        ]
+      ],
+      "to": [
+        232,
+        192
+      ],
+      "glow": {
+        "x": 232,
+        "y": 144,
+        "w": 184,
+        "h": 64,
+        "rx": 7
+      },
+      "color": "#4CF490",
+      "note": "Read the user requirements"
+    },
+    {
+      "id": "a_review",
+      "kind": "packet",
+      "at": 2.9,
+      "travel": 0.7,
+      "from": [
+        324,
+        208
+      ],
+      "via": [],
+      "to": [
+        324,
+        264
+      ],
+      "glow": {
+        "x": 232,
+        "y": 264,
+        "w": 184,
+        "h": 64,
+        "rx": 7
+      },
+      "color": "#4CF490",
+      "note": "Show the proposed plan for approval"
+    },
+    {
+      "id": "a_build",
+      "kind": "packet",
+      "at": 4.2,
+      "travel": 0.7,
+      "from": [
+        416,
+        296
+      ],
+      "via": [],
+      "to": [
+        488,
+        296
+      ],
+      "glow": {
+        "x": 488,
+        "y": 264,
+        "w": 140,
+        "h": 64,
+        "rx": 7
+      },
+      "color": "#4CF490",
+      "note": "Write the agreed project specification"
+    },
+    {
+      "id": "a_checks",
+      "kind": "packet",
+      "at": 5.6,
+      "travel": 0.7,
+      "from": [
+        556,
+        264
+      ],
+      "via": [],
+      "to": [
+        556,
+        208
+      ],
+      "glow": {
+        "x": 488,
+        "y": 144,
+        "w": 140,
+        "h": 64,
+        "rx": 7
+      },
+      "color": "#4CF490",
+      "note": "Generate and run the configured checks"
+    },
+    {
+      "id": "a_phase1",
+      "kind": "phase",
+      "at": 0,
+      "until": 2.5,
+      "text": "1 \u00b7 UNDERSTAND",
+      "x": 632,
+      "y": 104,
+      "color": "#4CF490",
+      "anchor": "end",
+      "class": "t-small"
+    },
+    {
+      "id": "a_phase2",
+      "kind": "phase",
+      "at": 2.7,
+      "until": 4.1,
+      "text": "2 \u00b7 AGREE",
+      "x": 632,
+      "y": 104,
+      "color": "#4CF490",
+      "anchor": "end",
+      "class": "t-small"
+    },
+    {
+      "id": "a_phase3",
+      "kind": "phase",
+      "at": 4.2,
+      "until": 8.8,
+      "text": "3 \u00b7 BUILD YOUR HARNESS",
+      "x": 632,
+      "y": 104,
+      "color": "#4CF490",
+      "anchor": "end",
+      "class": "t-small"
+    }
+  ]
+}
