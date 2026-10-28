@@ -197,14 +197,16 @@ generated CI alone does not configure the server.
 
 ## Use your existing agent
 
-Five self-contained skills guide project setup, requirements review, custom rules,
-property tests and mutation analysis. Copy the selected folders with their references
-and notices into your agent's skill directory; see [installation](docs/usage.md#install-the-skills).
+Six self-contained skills guide project setup, code changes, requirements review,
+custom rules, property tests and mutation analysis. Copy the selected folders with
+their references and notices into your agent's skill directory; see
+[installation](docs/usage.md#install-the-skills).
 
 <details>
 <summary><strong>Choose a skill</strong></summary>
 
 - [build-python-harness](skills/build-python-harness/SKILL.md) — create, adopt, audit or update the harness.
+- [disciplined-code-change](skills/disciplined-code-change/SKILL.md) — work test-first on behavioral changes and verify refactoring.
 - [spec-to-code-compliance](skills/spec-to-code-compliance/SKILL.md) — trace requirements to implementation and evidence.
 - [semgrep-rule-creator](skills/semgrep-rule-creator/SKILL.md) — build tested rules with the chosen engine, including ast-grep.
 - [property-based-testing](skills/property-based-testing/SKILL.md) — design useful generators and independent oracles.

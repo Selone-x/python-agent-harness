@@ -215,11 +215,12 @@ code: this tool is not a sandbox for malicious code.
 
 ## Install the skills
 
-The pack contains five self-contained skills:
+The pack contains six self-contained skills:
 
 | Skill | Purpose |
 | --- | --- |
 | [build-python-harness](../skills/build-python-harness/SKILL.md) | Build or adopt the executable harness |
+| [disciplined-code-change](../skills/disciplined-code-change/SKILL.md) | Implement and verify behavioral changes incrementally |
 | [spec-to-code-compliance](../skills/spec-to-code-compliance/SKILL.md) | Trace requirements to implementation and test evidence |
 | [semgrep-rule-creator](../skills/semgrep-rule-creator/SKILL.md) | Create custom rules and validate matches/nonmatches |
 | [property-based-testing](../skills/property-based-testing/SKILL.md) | Design and review meaningful Hypothesis properties |
