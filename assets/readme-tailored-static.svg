@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="432" viewBox="0 0 660 432" fill="none" role="img" aria-label="Your agent reads the existing project and your rules, proposes a plan for your approval, then prepares the project harness and its checks.">
+  <style>
+    /* ---- type ramp (light skin) --------------------------------------- */
+    text { font-family: 'Source Code Pro', ui-monospace, Menlo, Consolas, monospace; }
+    .t-title { font-size: 17px; font-weight: 700; letter-spacing: 2px; fill: #2D3142; }
+    .t-sub   { font-family: Inter, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; fill: #4F5D75; }
+    .t-zone  { font-size: 9px; letter-spacing: 1.5px; fill: #4F5D75; }
+    .t-name  { font-size: 12px; letter-spacing: 1px; fill: #3B4054; }
+    .t-small { font-size: 10px; letter-spacing: 1px; fill: #4F5D75; }
+    .t-desc  { font-family: Inter, -apple-system, 'Segoe UI', sans-serif; font-size: 10px; fill: #4F5D75; }
+    .t-tag   { font-size: 7.5px; font-weight: 600; letter-spacing: 1px; }
+    .t-prose { font-family: Inter, -apple-system, 'Segoe UI', sans-serif; font-size: 10px; fill: #4F5D75; }
+    .t-badge { font-size: 8.5px; font-weight: 600; letter-spacing: 1px; fill: #6E6479; }
+
+    </style>
+  <rect x="0.5" y="0.5" width="659" height="431" rx="12" fill="#F5F5F5" stroke="#D9DADB" />
+  <text class="t-title" x="28" y="44" text-anchor="start">TAILORED TO YOUR PROJECT</text>
+  <text class="t-sub" x="28" y="72" text-anchor="start">Your code and rules become an agreed, executable harness.</text>
+  <path d="M 172 176 L 232 176" stroke="#BFC0C0" stroke-width="1.5" />
+  <polygon points="226,179 232,176 226,173" fill="#BFC0C0" />
+  <path d="M 172 296 L 196 296 Q 204 296 204 288 L 204 200 Q 204 192 212 192 L 232 192" stroke="#BFC0C0" stroke-width="1.5" />
+  <polygon points="226,195 232,192 226,189" fill="#BFC0C0" />
+  <path d="M 324 208 L 324 264" stroke="#BFC0C0" stroke-width="1.5" />
+  <polygon points="321,258 324,264 327,258" fill="#BFC0C0" />
+  <path d="M 416 296 L 488 296" stroke="#BFC0C0" stroke-width="1.5" />
+  <polygon points="482,299 488,296 482,293" fill="#BFC0C0" />
+  <path d="M 556 264 L 556 208" stroke="#BFC0C0" stroke-width="1.5" />
+  <polygon points="559,214 556,208 553,214" fill="#BFC0C0" />
+  <g data-node="project">
+    <rect x="32" y="144" width="140" height="64" rx="7" fill="#FFFFFF" stroke="#BFC0C0" />
+    <circle cx="46" cy="164" r="2.5" fill="#4F5D75" />
+    <text class="t-name" x="56" y="168">PROJECT</text>
+    <text class="t-desc" x="44" y="192">your existing code</text>
+  </g>
+  <g data-node="rules">
+    <rect x="32" y="264" width="140" height="64" rx="7" fill="#FFFFFF" stroke="#BFC0C0" />
+    <circle cx="46" cy="284" r="2.5" fill="#4F5D75" />
+    <text class="t-name" x="56" y="288">RULES</text>
+    <text class="t-desc" x="44" y="312">your constraints</text>
+  </g>
+  <g data-node="agent">
+    <rect x="232" y="144" width="184" height="64" rx="7" fill="#FFFFFF" stroke="#BFC0C0" />
+    <circle cx="246" cy="164" r="2.5" fill="#4F5D75" />
+    <text class="t-name" x="256" y="168">YOUR AGENT</text>
+    <text class="t-desc" x="244" y="192">inspect + propose</text>
+  </g>
+  <g data-node="approval">
+    <rect x="232" y="264" width="184" height="64" rx="7" fill="#FFFFFF" stroke="#BFC0C0" />
+    <circle cx="246" cy="284" r="2.5" fill="#4F5D75" />
+    <text class="t-name" x="256" y="288">YOU APPROVE</text>
+    <text class="t-desc" x="244" y="312">review the plan</text>
+  </g>
+  <g data-node="harness">
+    <rect x="488" y="264" width="140" height="64" rx="7" fill="#FFFFFF" stroke="#BFC0C0" />
+    <circle cx="502" cy="284" r="2.5" fill="#4F5D75" />
+    <text class="t-name" x="512" y="288">HARNESS</text>
+    <text class="t-desc" x="500" y="312">project.toml</text>
+  </g>
+  <g data-node="checks">
+    <rect x="488" y="144" width="140" height="64" rx="7" fill="#FFFFFF" stroke="#BFC0C0" />
+    <circle cx="502" cy="164" r="2.5" fill="#4F5D75" />
+    <text class="t-name" x="512" y="168">CHECKS</text>
+    <text class="t-desc" x="500" y="192">lint · types · tests</text>
+  </g>
+  <text class="t-small" x="348" y="240" text-anchor="start">PLAN</text>
+  <text class="t-prose" x="330" y="368" text-anchor="middle">Keep your tools. Agree your boundaries. Run your checks.</text>
+  <circle cx="36" cy="404" r="4" fill="#15803D" />
+  <text class="t-small" x="48" y="408" text-anchor="start">SETUP FLOW</text>
+</svg>

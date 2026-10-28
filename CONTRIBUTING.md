@@ -78,19 +78,41 @@ check; keep the agreed checks and test expectations intact.
 
 ## Rebuild the README animations
 
+The main setup diagram is an illustrated workflow authored with the external
+[animdiagram skill](https://github.com/praveenvijayan/animdiagram). Its editable
+source is `assets/readme-tailored.svg`; `assets/readme-tailored.spec.json` holds the
+ten-second motion sequence. The light version is derived from the dark source;
+the static version keeps the light diagram's nodes, connectors and labels while
+removing its motion layers. The README selects that static file for reduced-motion
+readers. Attribution is in `assets/readme-tailored-NOTICE.txt`.
+
+Keep the skill checkout outside this project. With a local checkout, recompile
+the motion and derive the light version using the existing locked environment:
+
+```sh
+uv run --locked python /path/to/animdiagram/scripts/timeline.py assets/readme-tailored.spec.json --inject assets/readme-tailored.svg
+uv run --locked python /path/to/animdiagram/scripts/skin.py assets/readme-tailored.svg --to light
+uv run --locked python /path/to/animdiagram/scripts/check.py assets/readme-tailored.svg assets/readme-tailored-light.svg --strict
+```
+
+After geometry or copy changes, update the static companion as well. Inspect the
+animation in an `<img>` element, both color schemes and reduced-motion mode, then
+run `just check`. This diagram illustrates the agreed setup flow; it does not
+establish agent-host acceptance or a guarantee about application correctness.
+
 The GIFs are narrated replays of a verified isolated example, with summarized
 terminal output. The fee test expects `100 - 7 == 93`; the incorrect source returns
 107, and correcting the source passes the same tests. The installation sequence
 was also exercised in an isolated checkout, including the initial scaffold checks.
 These examples do not certify arbitrary project requirements.
 
-The primary customization animation shows an illustrated user/agent exchange.
+The expandable customization demo shows an illustrated user/agent exchange.
 Its resulting import boundary, forbidden-import failure, corrected audit and full
 project checks were exercised with real CLI commands while preserving the existing
 tool configuration. The agent dialogue and installation prompt are explanatory
 scenes, not recordings of a particular agent host.
 
-To change the visuals or captions, edit the scene definitions and SVG rendering in
+To change the GIFs or their captions, edit the scene definitions and SVG rendering in
 [tools/render_readme_media.py](tools/render_readme_media.py), then run:
 
 ```sh
