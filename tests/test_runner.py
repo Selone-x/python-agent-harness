@@ -96,6 +96,7 @@ def test_current_required_job_evidence_passes_and_tampering_fails(project: Path)
         ("fingerprint", "old"),
         ("inputs_unchanged", False),
         ("checks", []),
+        ("findings", {}),
         ("schema_version", 2),
     ):
         changed = {**original, key: value}

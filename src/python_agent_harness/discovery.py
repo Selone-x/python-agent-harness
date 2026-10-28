@@ -57,6 +57,7 @@ class Inspection(TypedDict):
     lockfiles: list[str]
     instructions: list[str]
     ci: list[str]
+    command_files: list[str]
     source_candidates: list[str]
     test_candidates: list[str]
     architecture: str
@@ -80,6 +81,10 @@ def dependency_sets(data: dict[str, object]) -> dict[str, object]:
     )
     poetry = mapping(mapping(data.get("tool")).get("poetry"))
     groups["poetry"] = list(mapping(poetry.get("dependencies")))
+    groups.update(
+        (f"poetry-group:{name}", list(mapping(mapping(group).get("dependencies"))))
+        for name, group in mapping(poetry.get("group")).items()
+    )
     return groups
 
 
@@ -134,6 +139,11 @@ def inspect_project(root: Path) -> Inspection:
         instructions=[name for name in ("AGENTS.md", "CLAUDE.md") if inside(root, name).exists()],
         ci=[
             name for name in (".github/workflows", ".gitlab-ci.yml") if inside(root, name).exists()
+        ],
+        command_files=[
+            name
+            for name in ("Makefile", "makefile", "justfile", "Justfile", "tox.ini", "noxfile.py")
+            if inside(root, name).is_file()
         ],
         source_candidates=[name for name in ("src", "app", "lib") if inside(root, name).is_dir()],
         test_candidates=[name for name in ("tests", "test") if inside(root, name).is_dir()],

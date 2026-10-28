@@ -188,6 +188,7 @@ def gate(root: Path, spec: Spec) -> tuple[Finding, ...]:
                     and item["detail"] == "finished"
                     for item in observed
                 )
+                and isinstance(report["findings"], list)
                 and all(
                     item["status"] in {"pass", "review", "not_applicable"}
                     for item in report["findings"]

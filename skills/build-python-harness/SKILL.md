@@ -18,6 +18,16 @@ toolchain, check commands and test invariants. Inspect existing code and
 configuration first. Ask only about decisions that inspection cannot establish.
 Preserve existing guidelines and tooling; the new-project defaults are proposals.
 
+Use `overview` for read-only discovery, the render preview and current evidence
+when a valid specification exists. Before applying, present a plan that names:
+observed mechanisms and their source files; existing tools and instructions to
+preserve; proposed additions and their reasons; decisions that need user input;
+the generated-file diff or a visible conflict; and verification commands. Label
+agent proposals separately from observations and declared policy. Do not invent
+commands, architecture, approval or evidence when the overview is incomplete.
+After checks, distinguish configured commands from current successful evidence,
+manual review and unverified server protection. The overview does not run doctor.
+
 Record each requirement with an honest enforcement mode: executable check,
 test, or review. Automated requirements need executed positive/negative evidence;
 semantic review requirements must remain visible. Do not invent a Result model,
