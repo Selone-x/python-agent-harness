@@ -14,6 +14,7 @@ SKILLS = Path(__file__).resolve().parents[1] / "skills"
     "name",
     [
         "build-python-harness",
+        "disciplined-code-change",
         "spec-to-code-compliance",
         "semgrep-rule-creator",
         "property-based-testing",
