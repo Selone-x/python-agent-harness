@@ -12,6 +12,17 @@ from .model import Finding, Spec
 from .paths import HarnessError, inside, source_files
 
 MANIFEST = ".harness/manifest.json"
+SUPPRESSION = re.compile(
+    r"#\s*(?:(?:(?:ruff|flake8):\s*)?noqa\b|(?:type|ty):\s*ignore\b|"
+    r"pragma:\s*no\s*(?:cover|branch)\b)",
+    re.IGNORECASE,
+)
+QUALIFIED_SUPPRESSION = re.compile(
+    r"#\s*(?:(?:(?:ruff|flake8):\s*)?noqa:\s*[A-Z][A-Z0-9]*(?:\s*,\s*[A-Z][A-Z0-9]*)*|"
+    r"(?:type|ty):\s*ignore\[\s*[A-Z][A-Z0-9_-]*(?:\s*,\s*[A-Z][A-Z0-9_-]*)*\s*\]|"
+    r"pragma:\s*no\s*(?:cover|branch))\s+-\s*\S",
+    re.IGNORECASE,
+)
 
 
 def digest(content: bytes) -> str:
@@ -55,15 +66,30 @@ def matches(module: str, prefix: str) -> bool:
     return module == prefix or module.startswith(prefix + ".")
 
 
+def package_dependencies(names: tuple[str, ...], packages: set[str]) -> set[str]:
+    """Importing a local module also executes its existing package initializers."""
+    parents: set[str] = set()
+    for name in names:
+        pieces = name.split(".")
+        parents.update(".".join(pieces[:index]) for index in range(1, len(pieces)))
+    return parents & packages
+
+
 def dependency_graph(root: Path, spec: Spec) -> dict[str, tuple[str, ...]]:
     """Build an import graph without importing user code."""
-    return {
+    inventory = modules(root, spec)
+    packages = {name for name, path in inventory.items() if path.name == "__init__.py"}
+    graph = {
         name: imports(
             ast.parse(path.read_text(encoding="utf-8"), filename=str(path)),
             name,
             path.name == "__init__.py",
         )
-        for name, path in modules(root, spec).items()
+        for name, path in inventory.items()
+    }
+    return {
+        name: tuple(sorted(set(targets) | package_dependencies((name, *targets), packages)))
+        for name, targets in graph.items()
     }
 
 
@@ -189,6 +215,14 @@ def evidence(root: Path, spec: Spec) -> tuple[Finding, ...]:
     return tuple(findings)
 
 
+def unexplained_suppression(comment: str) -> bool:
+    """Check every directive, including file-level noqa and tool-specific ignores."""
+    return any(
+        QUALIFIED_SUPPRESSION.match(comment, match.start()) is None
+        for match in SUPPRESSION.finditer(comment)
+    )
+
+
 def suppressions(root: Path, spec: Spec) -> tuple[Finding, ...]:
     """Flag unqualified or unexplained common suppressions in production and tests."""
     found: list[Finding] = []
@@ -199,10 +233,7 @@ def suppressions(root: Path, spec: Spec) -> tuple[Finding, ...]:
             if token.type != tokenize.COMMENT:
                 continue
             index, line = token.start[0], token.string
-            if re.search(r"#\s*(?:noqa|type:\s*ignore|pragma:\s*no cover)", line) and not re.search(
-                r"(?:noqa:\s*[A-Z][A-Z0-9, ]*|type:\s*ignore\[[^]]+\]|pragma:\s*no cover)\s+-\s*\S",
-                line,
-            ):
+            if unexplained_suppression(line):
                 found.append(
                     Finding(
                         code="suppression.reason",
@@ -279,8 +310,23 @@ def declared_inputs(root: Path, names: tuple[str, ...]) -> set[Path]:
     return paths
 
 
+def managed_fingerprints(root: Path) -> dict[str, str]:
+    """Bind actual owned content, including missing files, rather than manifest claims."""
+    from .render import block_content, previous_manifest
+
+    result: dict[str, str] = {}
+    for name, record in previous_manifest(root).items():
+        path = inside(root, name)
+        if not path.is_file():
+            result[name] = "missing"
+            continue
+        content = path.read_bytes()
+        result[name] = digest(block_content(content) if record["block"] else content)
+    return result
+
+
 def fingerprint(root: Path, spec: Spec) -> str:
-    """Bind a command report to policy, source, tests and the current runner."""
+    """Bind a command report to policy, source, tests and actual managed artifacts."""
     paths = set(source_files(root, spec.sources))
     extras = (*spec.inputs, *(name for rule in spec.requirements for name in rule.evidence))
     paths.update(declared_inputs(root, extras))
@@ -295,7 +341,9 @@ def fingerprint(root: Path, spec: Spec) -> str:
     for name in ("pyproject.toml", "uv.lock", "poetry.lock", "requirements.txt"):
         if inside(root, name).is_file():
             paths.add(inside(root, name))
-    content = "\n".join(
-        f"{path.relative_to(root).as_posix()}:{digest(path.read_bytes())}" for path in sorted(paths)
+    identities = managed_fingerprints(root)
+    identities.update(
+        (path.relative_to(root).as_posix(), digest(path.read_bytes())) for path in paths
     )
+    content = "\n".join(f"{name}:{identity}" for name, identity in sorted(identities.items()))
     return digest(content.encode())
