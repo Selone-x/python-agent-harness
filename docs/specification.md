@@ -87,9 +87,19 @@ the evidence path must exist. A requirement with `enforcement = "test"` follows
 the same mapping rules. Use `enforcement = "review"` for semantic requirements
 that cannot honestly be automated. Requirement ids and check ids are unique.
 
-The import graph follows static local imports transitively. Dynamic imports,
-dependency injection, plugin loading and business correctness need separate
-evidence. A matched directory name is not proof that the architecture is correct.
+The import graph follows static local imports transitively, including existing
+local `__init__.py` modules executed when loading a module or its imported packages.
+Namespace directories without initializers do not hide deeper package initializers.
+The audit parses source without executing user code. Dynamic imports, dependency
+injection, plugin loading and business correctness need separate evidence.
+A matched directory name is not proof that the architecture is correct.
+
+Suppression auditing inspects Python comments in source and tests. Inline `noqa`,
+file-level `ruff: noqa` / `flake8: noqa`, `type: ignore` and `ty: ignore` require
+specific rule codes followed by ` - explanation`. Blanket directives and empty
+code lists fail. Coverage directives `pragma: no cover` and `pragma: no branch`
+require the same explanation. Each directive in a comment is checked separately;
+string literals containing example directives are not suppressions.
 
 Custom Fixit rules live in the consumer project, are covered by real engine
 tests and are mapped to an explicit check. See the skill's
@@ -100,3 +110,10 @@ Run `render` to preview paths and sizes, then review actual changed files after
 tracks generated files and only the managed portions of instruction files.
 Unowned file conflicts and edited managed blocks stop rendering. Disabling an
 existing provider requires a separate manual removal review.
+
+Report fingerprints include the actual current contents of every artifact in the
+ownership manifest, including workflows, hooks and generated policy. Editing or
+deleting an artifact invalidates existing evidence. For `AGENTS.md` and `CLAUDE.md`,
+only managed blocks are bound automatically; list a file in `inputs` to bind its
+entire contents. Invalid managed markers block evidence generation. Rerun the
+configured groups after updating the runtime or generated artifacts.

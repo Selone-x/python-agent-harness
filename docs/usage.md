@@ -174,15 +174,20 @@ Coverage requires a complete inventory, even for modules never imported by
 tests. Lines and branches use separate exact comparisons. A program without
 branches can pass; missing tests or an empty coverage report cannot.
 
-Static import boundaries include transitive local imports. Dynamic imports,
-framework injection and runtime wiring require tests/review. A useful assertion
-oracle cannot be established by the presence of a test filename or a high
+Static import boundaries include transitive local imports and the existing package
+initializers executed by those imports or by loading the checked module. Dynamic
+imports, framework injection and runtime wiring require tests/review. A useful
+assertion oracle cannot be established by the presence of a test filename or a high
 coverage percentage. Mutation and benchmark commands can be added to the deep
 group; project-specific performance baselines and mutation policies require agreement.
 
-Reports are bound to the policy, runtime, production source, tests and dependency
-metadata. Stale reports, skipped groups, nonzero exits, timeouts and excessive
-output fail. Each command runs without a shell, sequentially, in a process group;
+Reports are bound to the policy, runtime, production source, tests, dependency
+metadata and actual managed artifact contents. Editing or deleting a generated
+workflow, hook, policy file or managed instruction block invalidates earlier
+reports. User text outside managed instruction blocks is excluded unless the
+whole file is explicitly declared in `inputs`. Stale reports, skipped groups,
+nonzero exits, timeouts and excessive output fail. Each command runs without a
+shell, sequentially, in a process group;
 logs are bounded. Commands in an approved spec still execute arbitrary project
 code: this tool is not a sandbox for malicious code.
 
