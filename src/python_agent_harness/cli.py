@@ -14,6 +14,7 @@ from .coverage import verify_coverage
 from .discovery import inspect_project
 from .model import Finding, successful
 from .mutations import mutation_gate
+from .overview import overview
 from .package import verify_package
 from .paths import HarnessError
 from .providers import doctor
@@ -28,6 +29,7 @@ def parser() -> argparse.ArgumentParser:
     command.add_argument("--version", action="version", version=__version__)
     modes = command.add_subparsers(dest="mode", required=True)
     modes.add_parser("inspect", help="Read existing tooling, instructions and layout")
+    modes.add_parser("overview", help="Read adoption plan, detected mechanisms and evidence limits")
     init = modes.add_parser("init", help="Write a draft spec; optionally scaffold an empty project")
     init.add_argument("--name", required=True)
     init.add_argument("--package", required=True)
@@ -109,6 +111,11 @@ def dispatch(root: Path, args: argparse.Namespace) -> int:
     """Route commands without letting inspection silently mutate application code."""
     if args.mode == "inspect":
         emit(inspect_project(root))
+    elif args.mode == "overview":
+        result = overview(root)
+        emit(result)
+        if result["status"] == "blocked":
+            return 2
     elif args.mode == "init":
         root.mkdir(parents=True, exist_ok=True)
         paths = initialize(

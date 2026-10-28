@@ -158,7 +158,9 @@ use `--provider gitlab`, or both providers, for the corresponding CI.
 
 </details>
 
-**Already have a project?** Start with `inspect`, then `init` without `--scaffold`.
+**Already have a project?** Start with `overview`, then `init` without `--scaffold`.
+The read-only overview maps existing tooling, previews generated changes when the
+specification is valid, and separates current check evidence from unverified protection.
 Keep the existing formatter, type checker and package manager; agree their real
 commands before rendering. Follow the [adoption guide](docs/usage.md#adopt-an-existing-project).
 

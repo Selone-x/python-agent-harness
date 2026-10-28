@@ -143,7 +143,29 @@ budgets do not impose a universal memory or disk quota on arbitrary project code
 
 ## Adopt an existing project
 
-Run `inspect` first. Then run `init` **without** `--scaffold`; only the draft
+Run `overview` first to inspect the existing project without changing it:
+
+```sh
+uv run --locked harness --root /path/to/project overview
+```
+
+The JSON includes discovered tool declarations and their sources, lockfiles,
+instructions, CI paths and common command files. Discovery is not exhaustive:
+it does not parse command files or infer that tools are installed or used.
+When a valid specification exists, it also includes declared checks, requirements,
+the actual render diff or a conflict, and required-group gate findings. It separates
+missing, stale, failed and malformed group reports; a failed group does not imply
+every individual requirement in that group failed. Missing, invalid or stale
+evidence does not become a successful result. The command does
+not execute checks or contact the hosting provider; server protection is unverified
+until an explicit `doctor` query. Optional `deep` checks are not covered by the
+required gate. A missing specification is reported as missing; an invalid one
+or a blocked render preview retains inspection facts and exits 2.
+
+Ask your agent to distinguish observations, proposals and unresolved decisions,
+and to map existing project mechanisms before proposing additions. The overview
+does not itself decide what to preserve or approve changes on the user's behalf.
+`inspect` remains available for discovery alone. Then run `init` **without** `--scaffold`; only the draft
 specification is created. Adoption drafts deliberately fail until the agent and
 user replace the draft commands with the project's real formatter, type checker,
 test runner, coverage command and setup commands. Existing Black/mypy/Poetry or
